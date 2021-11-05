@@ -1,10 +1,13 @@
 import telebot
 from news_parser import parse
 from telebot import types
-
+from DB_conn.DB_conn import DBConnection
 
 token = "2024403137:AAG-ZXMvorH6nMrApa0JlELgdF-fERtU15g"
 bot = telebot.TeleBot(token)
+
+
+con = DBConnection()
 
 
 last_news = ""
@@ -14,6 +17,10 @@ last_news = ""
 def send_welcome(message):
     bot.reply_to(message,
                  f"Привет {message.from_user.first_name}. \nЧтобы узнать последние новости набери 'Новости'")
+    con.add_user(username=message.from_user.username,
+                 us_name=message.from_user.first_name,
+                 us_sname=message.from_user.last_name)
+    bot.reply_to(message, "Ваши данные были добавленны в базу")
 
 
 @bot.message_handler(commands=['help'])
@@ -28,7 +35,7 @@ def send_news(message):
         content = parse()
         if last_news != content["title"]:
             keyboard = types.InlineKeyboardMarkup()
-            key_read = types.InlineKeyboardButton(text="Читать статью", callback_data="read")
+            key_read = types.InlineKeyboardButton(text="Читать полностью", callback_data="read")
             keyboard.add(key_read)
             bot.send_photo(message.from_user.id,
                            photo=content['pict'],
