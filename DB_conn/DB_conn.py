@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .DB_work import Base, User, Record
+from .DB_tables import Base, User, Record
 import datetime
 
 
 class DBConnection:
     def __init__(self):
-        self.engine = create_engine("mysql+mysqlconnector://vladimir:123@localhost/telegrambotdb", echo=True)
+        self.engine = create_engine("", echo=True)
         self.session = sessionmaker(bind=self.engine)
         self.s = self.session()
 
@@ -16,9 +16,8 @@ class DBConnection:
         self.s.commit()
 
     def add_record(self, rec_text, un):
-        q = self.s.query(User).filter(User.username == un)
-        user_id = q.id_user
-        rec = Record(rec_date=datetime.datetime.now(), rec_text=rec_text, user_id=user_id)
+        u_id = [row.id_user for row in self.s.query(User).filter(User.username == un)]
+        rec = Record(rec_date=datetime.datetime.now(), rec_text=rec_text, user_id=u_id[0])
         self.s.add(rec)
         self.s.commit()
 
@@ -31,9 +30,18 @@ class DBConnection:
                          "us_name": row.us_name,
                          "us_sname": row.us_sname})
 
+    def get_record(self, un):
+        u_id = [row.id_user for row in self.s.query(User).filter(User.username == un)]
+        result = self.s.query(Record).filter(Record.user_id == u_id[0])
+        recs = []
+        for row in result:
+            recs.append({"date": row.rec_date,
+                         "text": row.rec_text})
 
+        return recs
 if __name__ == "__main__":
     con = DBConnection()
     #con.add_user("Vasya777", "Vasya", "Pupkin")
     #con.add_record("Не опоздать к врачу", user_id=1)
+    print(con.get_record("Vasya777"))
 

@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 
-url = "mysql+mysqlconnector://vladimir:123@localhost/telegrambotdb"
+url = ""
 
 engine = create_engine(url, echo=True)
 Base = declarative_base()
