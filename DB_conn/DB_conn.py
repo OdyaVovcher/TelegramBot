@@ -5,8 +5,10 @@ import datetime
 
 
 class DBConnection:
+    __url = ""
+
     def __init__(self):
-        self.engine = create_engine("", echo=True)
+        self.engine = create_engine(self.__url, echo=True)
         self.session = sessionmaker(bind=self.engine)
         self.s = self.session()
 
@@ -39,9 +41,11 @@ class DBConnection:
                          "text": row.rec_text})
 
         return recs
+
+
 if __name__ == "__main__":
     con = DBConnection()
-    #con.add_user("Vasya777", "Vasya", "Pupkin")
-    #con.add_record("Не опоздать к врачу", user_id=1)
+    # con.add_user("Vasya777", "Vasya", "Pupkin")
+    # con.add_record("Не опоздать к врачу", user_id=1)
     print(con.get_record("Vasya777"))
 
