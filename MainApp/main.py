@@ -1,4 +1,5 @@
 import telebot
+import datetime
 from news_parser import parse
 from telebot import types
 from DB_conn.DB_conn import DBConnection
@@ -48,8 +49,12 @@ def send_news(message):
 
     if message.text.upper() == "ПОСЛЕДНЯЯ ЗАМЕТКА":
         con = DBConnection()
-        record = con.get_record(un=message.from_user.username)[-1]
-        bot.send_message(message.from_user.id, text=f"ДАТА: {record['date']}\nТЕКСТ: {record['text']}")
+        records = con.get_record(un=message.from_user.username)
+        dates = [key for key in records]
+        dates.sort()
+        last_date = dates[-1]
+        last_record = records[last_date]
+        bot.send_message(message.from_user.id, text=f"ДАТА: {last_date}\nТЕКСТ: {last_record}")
 
 
 insert_record_text = ""

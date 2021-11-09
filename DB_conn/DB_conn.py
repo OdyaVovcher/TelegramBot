@@ -5,7 +5,7 @@ import datetime
 
 
 class DBConnection:
-    __url = ""
+    __url = "mysql+mysqlconnector://vladimir:123@localhost/telegrambotdb"
 
     def __init__(self):
         self.engine = create_engine(self.__url, echo=True)
@@ -35,11 +35,9 @@ class DBConnection:
     def get_record(self, un):
         u_id = [row.id_user for row in self.s.query(User).filter(User.username == un)]
         result = self.s.query(Record).filter(Record.user_id == u_id[0])
-        recs = []
+        recs = {}
         for row in result:
-            recs.append({"date": row.rec_date,
-                         "text": row.rec_text})
-
+            recs[row.rec_date] = row.rec_text
         return recs
 
 
