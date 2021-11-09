@@ -46,18 +46,23 @@ def send_news(message):
         bot.send_message(message.from_user.id, "Ведите текст заметки")
         bot.register_next_step_handler(message, insert_record)
 
+    if message.text.upper() == "ПОСЛЕДНЯЯ ЗАМЕТКА":
+        con = DBConnection()
+        record = con.get_record(un=message.from_user.username)[-1]
+        bot.send_message(message.from_user.id, text=f"ДАТА: {record['date']}\nТЕКСТ: {record['text']}")
 
-record_text = ""
+
+insert_record_text = ""
 
 
 def insert_record(message):
-    global record_text
+    global insert_record_text
     record_keyboard = types.InlineKeyboardMarkup()
     key_yes = types.InlineKeyboardButton(text="Да", callback_data="insert_record_yes")
     record_keyboard.add(key_yes)
     key_no = types.InlineKeyboardButton(text="Нет", callback_data="insert_record_no")
     record_keyboard.add(key_no)
-    record_text = message.text
+    insert_record_text= message.text
     bot.send_message(message.from_user.id, text="Cохранить заметку?", reply_markup=record_keyboard)
 
 
@@ -69,7 +74,7 @@ def callback_worker(call):
     if call.data == "insert_record_yes":
         print(call.message)
         con = DBConnection()
-        con.add_record(rec_text=record_text, un=call.message.chat.username)
+        con.add_record(rec_text=insert_record_text, un=call.message.chat.username)
         bot.send_message(call.message.chat.id, text="Заметка сохранена")
     elif call.data == "insert_record_no":
         bot.send_message(call.message.chat.id, text="Заметка отменена")
